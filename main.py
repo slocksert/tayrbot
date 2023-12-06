@@ -14,8 +14,8 @@ from PIL import Image
 class TayrBot:
     def __init__(self) -> None:
         self.url = 'https://signin.valuegaia.com.br/?provider=imob'
-        self.username = 'Wanderley.grupotrevo@gmail.com'
-        self.password = 'Wa2022.2022'
+        self.username = ''
+        self.password = ''
         self.driver = webdriver.Chrome()
         self.driver.get(self.url)
 
