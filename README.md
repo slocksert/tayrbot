@@ -1,9 +1,5 @@
 ## Automation using Python
 
-**Freelance**
-Nov 2023 - Dec 2023 · 2 months  
-Maceió, Alagoas, Brazil · Remote  
-
 Developed a bot using Selenium to meet client needs, which involved accessing a website where the client manually transcribed real estate data to a Word document, including data and images. Successfully automated a process that would have taken weeks of effort into just a few hours.
 
 - **Tools and Technologies:** Python, Selenium, Word Document Automation
