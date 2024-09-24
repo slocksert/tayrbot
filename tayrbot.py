@@ -18,7 +18,8 @@ class TayrBot:
         self.password = ''
         self.driver = webdriver.Chrome()
         self.driver.get(self.url)
-
+        os.makedirs('docs', exist_ok=True)
+        os.makedirs('docsimage', exist_ok=True)
 
     def find_login_inputs(self) -> tuple[WebElement, WebElement, WebElement]:
         email_input = WebDriverWait(self.driver, 10).until(EC.presence_of_element_located((By.ID, "email")))
@@ -27,11 +28,17 @@ class TayrBot:
     
         return email_input, pwd_input, login_btn
     
-    def interact_with_login_inputs(self, email_input:str, pwd_input:str, login_btn:str) -> None:
+    def interact_with_login_inputs(self, email_input: WebElement, pwd_input: WebElement, login_btn: WebElement) -> None:
         email_input.send_keys(self.username)
         pwd_input.send_keys(self.password)
-
-        sleep(20) #Time to answer captcha
+       
+        #click on iframe 
+        #iframe = WebDriverWait(self.driver, 10).until(EC.presence_of_element_located((By.XPATH, '//iframe[@title="reCAPTCHA"]')))
+        #self.driver.switch_to.frame(iframe)
+        #box = WebDriverWait(self.driver, 10).until(EC.presence_of_element_located((By.CSS_SELECTOR, 'div.recaptcha-checkbox-border')))
+        #box.click()
+        #self.driver.switch_to.default_content()
+        sleep(10)
         login_btn.click()
         sleep(10)
 
@@ -121,17 +128,18 @@ class TayrBot:
         photos.runs[0].font.size = Pt(24)
         photos.alignment = 1
 
-        image_folder = "D:\\Projects\\tayrbot\\docsimage"
+        image_folder = "docsimage"
+        docs_folder = 'docs'
 
         for image in os.listdir(image_folder):
             image_path = os.path.join(image_folder, image)
             self.add_image_to_doc(doc, image_path, width=Inches(6), height=Inches(6))
-
-        doc.save(f'D:\\Projects\\tayrbot\\docs\\{title}.docx')
+        
+        doc.save(os.path.join(docs_folder, f'{title}.docx'))
 
     def get_image(self) -> str:
         self.driver.switch_to.frame("propertyRecordIframe")
-        image_folder = "D:\\Projects\\tayrbot\\docsimage"
+        image_folder = "docsimage"
 
         div_photo = WebDriverWait(self.driver, 10).until(EC.element_to_be_clickable((By.ID, "fotoMin")))
         div_photo.click()
@@ -166,10 +174,7 @@ class TayrBot:
                 break
             
             elif response.status_code == 200:
-                if not os.path.exists(image_folder):
-                    os.makedirs(image_folder)
-
-                output = f"D:\\Projects\\tayrbot\\docsimage\\{count}.jpeg"
+                output = os.path.join(image_folder, f"{count}.jpeg")
                 with open(output, 'wb') as file:
                     file.write(response.content)
 
@@ -309,8 +314,9 @@ class TayrBot:
 
                     if card == cards[-1]:
                         try:
-                            button = WebDriverWait(self.driver, 10).until(EC.element_to_be_clickable((By.CLASS_NAME, "btn-md")))
+                            button = WebDriverWait(self.driver, 10).until(EC.element_to_be_clickable((By.CSS_SELECTOR, "button[class='btn btn-md btn-outline-success'] span")))
                             button.click()
+                            sleep(5)
                         except Exception:
                             print(f"Cards finished, exiting software...")
                         is_finished = True
@@ -322,8 +328,10 @@ class TayrBot:
         return count
     
     def close_ad(self) -> None:
-        popup = WebDriverWait(self.driver, 10).until(EC.presence_of_element_located((By.ID, "beamerAnnouncementPopup")))
-
+        try:
+            popup = WebDriverWait(self.driver, 10).until(EC.presence_of_element_located((By.ID, "beamerAnnouncementPopup")))
+        except Exception:
+            popup = None
         if popup:
             self.driver.switch_to.frame("beamerAnnouncementPopup")
             close_button = WebDriverWait(self.driver, 10).until(EC.element_to_be_clickable((By.CLASS_NAME, "popupClose")))
